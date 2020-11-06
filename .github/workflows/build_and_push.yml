@@ -50,5 +50,11 @@ jobs:
       - name: Get AKS credentials
         run: az aks get-credentials -n win-aks -g win-aks
 
+      - name: Update admission controller
+        run: kubectl apply -f admission.yaml
+
+      - name: update service
+        run: kubectl apply -f service.yaml
+
       - name: Update deployment
         run: kubectl apply -f deploy.yaml
