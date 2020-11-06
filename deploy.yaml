@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: python-admission
-        image: nfvnas.azurecr.io/python-admission/python-admission:2
+        image: nfvnas.azurecr.io/python-admission/python-admission:3
         ports:
         - containerPort: 8001
         volumeMounts:

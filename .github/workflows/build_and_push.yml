@@ -44,3 +44,11 @@ jobs:
       - name: Push container
         run: docker push nfvnas.azurecr.io/python-admission/python-admission:${{ github.run_number }}
 
+      - name: Update deployment
+        run: sed -i 's|nfvnas.azurecr.io/python-admission/python-admission:.*|nfvnas.azurecr.io/python-admission/python-admission:3|gi' deploy.yaml
+
+      - name: Get AKS credentials
+        run: az aks get-credentials -n win-aks -g win-aks
+
+      - name: Update deployment
+        run: kubectl apply -f deploy.yaml
