@@ -1,7 +1,14 @@
 # python-webhook
 
 
-You should create a cert and key, and configure that as a secret. 
+You should create a cert and key, and configure that as a secret. Cert should be created for domain  test-mutations.default.svc
+
+```bash
+openssl req -x509 -sha256 -newkey rsa:2048 -keyout certificate.key -out certificate.crt -days 1024 -nodes
+cat certificate.key | base64 -w 0
+cat certificate.crt | base64 -w 0
+```
+
 
 ```yaml
 
