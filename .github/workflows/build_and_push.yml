@@ -31,3 +31,16 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+
+      - name: az login
+        run: az login --service-principal --username ${{ secrets.APP_ID }} --password ${{ secrets.PASSWORD }} --tenant ${{ secrets.TENANT_ID }} 
+        
+      - name: Build Docker Container
+        run: docker build . -t nfvnas.azurecr.io/python-admission/python-admission:${{ github.run_number }}
+
+      - name: ACR login
+        run: az acr login -n nfvnas
+
+      - name: Push container
+        run: docker push nfvnas.azurecr.io/python-admission/python-admission:${{ github.run_number }}
+
