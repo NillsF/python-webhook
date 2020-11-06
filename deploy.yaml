@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-admission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-admission
+  template:
+    metadata:
+      labels:
+        app: python-admission
+    spec:
+      containers:
+      - name: python-admission
+        image: nfvnas.azurecr.io/python-admission/python-admission:2
+        ports:
+        - containerPort: 8001
+        volumeMounts:
+        - name: certs
+          mountPath: /var/run/vn-affinity-admission-controller
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: python-admission-cert
