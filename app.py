@@ -3,7 +3,7 @@ import base64
 import logging
 import jsonpatch
 admission_controller = Flask(__name__)
-@admission_controller.route('/mutate/deployments', methods=['POST'])
+@admission_controller.route('/mutate/pods', methods=['POST'])
 def deployment_webhook_mutate():
     request_info = request.get_json()
     logging.warning(request_info)
