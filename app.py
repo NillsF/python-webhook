@@ -22,7 +22,7 @@ def deployment_webhook_mutate():
     v1 = client.CoreV1Api()
     nodes = v1.list_node()
     logging.warning('Was able to get nodes from k8s api')
-
+    
 
 
     # Get OS from Pod
@@ -49,6 +49,7 @@ def deployment_webhook_mutate():
 
     # Check of nodes can meet demand. If a single node can meet demand, we pass. If not, we MUTATE!!
     need_to_mutate = True
+    all_pods = v1.list_pod_for_all_namespaces().items
     for node in nodes.items:
         # Checking if virtual kubelet:
         try:
@@ -57,15 +58,26 @@ def deployment_webhook_mutate():
         except KeyError:
             logging.info("skip if virtual kubelet")
             if node.metadata.labels['kubernetes.io/os'] == os_in_pod:
-                cpu_available = node.status.allocatable['cpu']
-                mem_available = node.status.allocatable['memory']
+                cpu_available = quantity.parse_quantity(node.status.allocatable['cpu'])
+                mem_available = quantity.parse_quantity(node.status.allocatable['memory'])
                 logging.warning("{} has {} CPU".format(node.metadata.labels['kubernetes.io/hostname'],cpu_available))
                 logging.warning("{} has {} Memory".format(node.metadata.labels['kubernetes.io/hostname'],mem_available))
-
-                if quantity.parse_quantity(cpu_available) > quantity.parse_quantity(cpu_req):
-                    if quantity.parse_quantity(mem_available) > quantity.parse_quantity(mem_req):
+                for pod in all_pods:
+                    try:
+                        if(pod.spec.node_name == node.metadata.labels['kubernetes.io/hostname']):
+                            cpu_available -= quantity.parse_quantity(pod.spec.containers[0].resources._requests["cpu"])
+                            mem_available -= quantity.parse_quantity(pod.spec.containers[0].resources._requests["memory"])
+                    except AttributeError as e :
+                        logging.warning("Pod {} doesn't have requests set.".format(pod.metadata.name))
+                        logging.warning(e)
+                    except TypeError as e:
+                        logging.warning("Pod {} doesn't have requests set.".format(pod.metadata.name))
+                        logging.warning(e)                            
+                if cpu_available > quantity.parse_quantity(cpu_req):
+                    if mem_available > quantity.parse_quantity(mem_req):
                         logging.warning("pod can be scheduled on node {}".format(node.metadata.labels['kubernetes.io/hostname']))
                         need_to_mutate = False
+                        node_status = v1.read_node_status(node.metadata.labels['kubernetes.io/hostname'])
                         break
         
     if need_to_mutate:
