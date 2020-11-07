@@ -42,8 +42,8 @@ def deployment_webhook_mutate():
     except KeyError as e:
         logging.error("Couldn't get requests")
         logging.error(e)
-        return jsonify({"response": {"allowed": True,
-                                 "status": {"message": "There were no req's set, no mutation applied"}
+        return jsonify({"response": {"allowed": False,
+                                 "status": {"message": "You should be setting requets!!! Otherwise, this whole thing fails. And we don't want this to fail, do we?"}
                                  }})
 
     return admission_response_patch(True, "Adding allow label", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/metadata/labels/allow", "value": "yes"}]))
