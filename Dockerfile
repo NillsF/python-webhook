@@ -7,7 +7,8 @@ RUN pip3 install flask jsonpatch kubernetes
 COPY app.py /var/run/app.py
 COPY app.py /var/run/quantity.py
 
+WORKDIR /var/run
 
 EXPOSE 8001/tcp
 
-CMD ["python","/var/run/app.py"]
+CMD ["python","app.py"]
