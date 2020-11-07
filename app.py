@@ -19,8 +19,8 @@ def deployment_webhook_mutate():
     else:
         config.load_incluster_config()
     v1 = client.CoreV1Api()
-    ret = v1.list_pod_for_all_namespaces(watch=False)
-    logging.warning('Was able to get pods from k8s api')
+    nodes = v1.list_node()
+    logging.warning('Was able to get nodes from k8s api')
 
 
 

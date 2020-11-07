@@ -12,6 +12,7 @@ spec:
       labels:
         app: python-admission
     spec:
+      serviceAccount: admission-python
       containers:
       - name: python-admission
         image: nfvnas.azurecr.io/python-admission/python-admission:3
