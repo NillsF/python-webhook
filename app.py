@@ -1,15 +1,29 @@
 from flask import Flask, request, jsonify
 from kubernetes import client, config
 
+import os
 import base64
 import logging
 import jsonpatch
+
+
 admission_controller = Flask(__name__)
 @admission_controller.route('/mutate/pods', methods=['POST'])
 def deployment_webhook_mutate():
     request_info = request.get_json()
     logging.warning("Got request")
-    
+
+    # Create kube cluster client
+    if os.path.exists('{}/.kube/config'.format(os.environ['HOME'])): #only used for local debugging
+        config.load_kube_config()
+    else:
+        config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    ret = v1.list_pod_for_all_namespaces(watch=False)
+    logging.warning('Was able to get pods from k8s api')
+
+
+
     # Get OS from Pod
     
     try:
@@ -20,12 +34,13 @@ def deployment_webhook_mutate():
     logging.warning("OS in pod is {}".format(os_in_pod))
 
     # Get request from Pod
-
-
-
-
-
-    logging.warning(request_info["request"]["object"]["spec"])        
+    try:
+        cpu_req = request_info["request"]["object"]["spec"]["containers"][0]["resources"]["requests"]["cpu"]
+        logging.warning(cpu_req)
+        mem_req = request_info["request"]["object"]["spec"]["containers"][0]["resources"]["requests"]["memory"]
+    except KeyError as e:
+        logging.error("error")
+        logging.error(e)
 
     return admission_response_patch(True, "Adding allow label", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/metadata/labels/allow", "value": "yes"}]))
 def admission_response_patch(allowed, message, json_patch):
