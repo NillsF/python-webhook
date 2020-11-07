@@ -28,9 +28,5 @@ spec:
         - containerPort: 80
       nodeSelector:
         kubernetes.io/os: linux
-      tolerations:
-      - key: virtual-kubelet.io/provider
-        operator: Exists
-      - effect: NoSchedule
-        key: azure.com/aci
+
         
