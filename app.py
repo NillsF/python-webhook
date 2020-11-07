@@ -20,6 +20,11 @@ def deployment_webhook_mutate():
     logging.warning("OS in pod is {}".format(os_in_pod))
 
     # Get request from Pod
+
+
+
+
+
     logging.warning(request_info["request"]["object"]["spec"])        
 
     return admission_response_patch(True, "Adding allow label", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/metadata/labels/allow", "value": "yes"}]))

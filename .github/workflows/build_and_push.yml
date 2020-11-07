@@ -51,10 +51,17 @@ jobs:
         run: az aks get-credentials -n win-aks -g win-aks
 
       - name: Update admission controller
-        run: kubectl apply -f admission.yaml
+        run: kubectl delete -f admission.yaml
+        continue-on-error: true
 
       - name: update service
         run: kubectl apply -f service.yaml
 
       - name: Update deployment
         run: kubectl apply -f deploy.yaml
+
+      - name: sleep 5 to make sure pods deploy
+        run: sleep 5
+      
+      - name: Update admission controller
+        run: kubectl apply -f admission.yaml
