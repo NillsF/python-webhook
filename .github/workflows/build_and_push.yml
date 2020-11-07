@@ -53,7 +53,12 @@ jobs:
       - name: Update admission controller
         run: kubectl delete -f admission.yaml
         continue-on-error: true
-
+      
+      - name: Setup servcie account and role binding
+        run: |
+          kubectl apply -f clusterRole.yaml
+          kubectl apply -f serviceAccount.yaml
+          kubectl apply -f clusterRoleBinding.yaml
       - name: update service
         run: kubectl apply -f service.yaml
 
