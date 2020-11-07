@@ -5,6 +5,7 @@ import os
 import base64
 import logging
 import jsonpatch
+import quantity
 
 
 admission_controller = Flask(__name__)
@@ -45,6 +46,30 @@ def deployment_webhook_mutate():
         return jsonify({"response": {"allowed": False,
                                  "status": {"message": "You should be setting requets!!! Otherwise, this whole thing fails. And we don't want this to fail, do we?"}
                                  }})
+
+    # Check of nodes can meet demand. If a single node can meet demand, we pass. If not, we MUTATE!!
+    need_to_mutate = True
+    for node in nodes.items:
+        # Checking if virtual kubelet:
+        try:
+            is_virtual = node.metadata.labels['type']
+            logging.warning(is_virtual)
+        except KeyError:
+            logging.info("skip if virtual kubelet")
+            if node.metadata.labels['kubernetes.io/os'] == os_in_pod:
+                cpu_available = node.status.allocatable['cpu']
+                mem_available = node.status.allocatable['memory']
+                if quantity.parse_quantity(cpu_available) > quantity.parse_quantity(cpu_req):
+                    if quantity.parse_quantity(mem_available) > quantity.parse_quantity(mem_req):
+                        logging.warning("pod can be scheduled on node {}".format(node.metadata.labels['kubernetes.io/hostname']))
+                        need_to_mutate = False
+                        break
+        
+    if need_to_mutate:
+        logging.warning("need to mutate")
+        return admission_response_patch(True, "Scheduling on virtual kubelet", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/spec/tolerations", "value": '{"key": "virtual-kubelet.io/provider","operator": "Exists"},{"effect": "NoSchedule","key": "azure.com/aci"}'}]))
+
+
 
     return admission_response_patch(True, "Adding allow label", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/metadata/labels/allow", "value": "yes"}]))
 def admission_response_patch(allowed, message, json_patch):
