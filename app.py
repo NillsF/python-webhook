@@ -36,11 +36,15 @@ def deployment_webhook_mutate():
     # Get request from Pod
     try:
         cpu_req = request_info["request"]["object"]["spec"]["containers"][0]["resources"]["requests"]["cpu"]
-        logging.warning(cpu_req)
+        logging.warning("cpu req is {}".format(cpu_req))
         mem_req = request_info["request"]["object"]["spec"]["containers"][0]["resources"]["requests"]["memory"]
+        logging.warning("memory req is {}".format(mem_req))
     except KeyError as e:
-        logging.error("error")
+        logging.error("Couldn't get requests")
         logging.error(e)
+        return jsonify({"response": {"allowed": True,
+                                 "status": {"message": "There were no req's set, no mutation applied"}
+                                 }})
 
     return admission_response_patch(True, "Adding allow label", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/metadata/labels/allow", "value": "yes"}]))
 def admission_response_patch(allowed, message, json_patch):
