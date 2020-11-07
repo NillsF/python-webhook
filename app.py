@@ -59,6 +59,9 @@ def deployment_webhook_mutate():
             if node.metadata.labels['kubernetes.io/os'] == os_in_pod:
                 cpu_available = node.status.allocatable['cpu']
                 mem_available = node.status.allocatable['memory']
+                logging.warning("{} has {} CPU".format(node.metadata.labels['kubernetes.io/hostname'],cpu_available))
+                logging.warning("{} has {} Memory".format(node.metadata.labels['kubernetes.io/hostname'],mem_available))
+
                 if quantity.parse_quantity(cpu_available) > quantity.parse_quantity(cpu_req):
                     if quantity.parse_quantity(mem_available) > quantity.parse_quantity(mem_req):
                         logging.warning("pod can be scheduled on node {}".format(node.metadata.labels['kubernetes.io/hostname']))
