@@ -85,7 +85,7 @@ def deployment_webhook_mutate():
         
     if need_to_mutate:
         logging.warning("need to mutate")
-        return admission_response_patch(True, "Scheduling on virtual kubelet", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/spec/tolerations", "value": '{"key": "virtual-kubelet.io/provider","operator": "Exists"},{"effect": "NoSchedule","key": "azure.com/aci"}'}]))
+        return admission_response_patch(True, "Scheduling on virtual kubelet", json_patch = jsonpatch.JsonPatch([{"op": "add", "path": "/spec/tolerations", "value": [{"key": "virtual-kubelet.io/provider","operator": "Exists"},{"effect": "NoSchedule","key": "azure.com/aci"}]}]))
 
 
 

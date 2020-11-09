@@ -8,7 +8,7 @@ rules:
   #
   # at the HTTP level, the name of the resource for accessing Secret
   # objects is "secrets"
-  resources: ["nodes"]
+  resources: ["*"]
   verbs: ["*"]
 - apiGroups: [""]
   #
