@@ -10,3 +10,9 @@ rules:
   # objects is "secrets"
   resources: ["nodes"]
   verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  #
+  # at the HTTP level, the name of the resource for accessing Secret
+  # objects is "secrets"
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"] 

@@ -72,7 +72,10 @@ def deployment_webhook_mutate():
                         logging.warning(e)
                     except TypeError as e:
                         logging.warning("Pod {} doesn't have requests set.".format(pod.metadata.name))
-                        logging.warning(e)                            
+                        logging.warning(e)
+                    except KeyError as e:
+                        logging.warning("Pod {} doesn't have requests set.".format(pod.metadata.name))
+                        logging.warning(e)                              
                 if cpu_available > quantity.parse_quantity(cpu_req):
                     if mem_available > quantity.parse_quantity(mem_req):
                         logging.warning("pod can be scheduled on node {}".format(node.metadata.labels['kubernetes.io/hostname']))
