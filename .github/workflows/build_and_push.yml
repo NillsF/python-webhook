@@ -56,6 +56,9 @@ jobs:
       
       - name: Setup servcie account and role binding
         run: |
+          kubectl delete -f clusterRole.yaml
+          kubectl delete -f serviceAccount.yaml
+          kubectl delete -f clusterRoleBinding.yaml
           kubectl apply -f clusterRole.yaml
           kubectl apply -f serviceAccount.yaml
           kubectl apply -f clusterRoleBinding.yaml
