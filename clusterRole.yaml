@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   # "namespace" omitted since ClusterRoles are not namespaced
-  name: node-reader
+  name: node-pod-reader
 rules:
 - apiGroups: [""]
   resources: ["nodes"]
