@@ -5,7 +5,7 @@ metadata:
   name: node-pod-reader
 rules:
 - apiGroups: [""]
-  resources: ["nodes"]
+  resources: ["nodes","nodes/status","nodes/metrics"]
   verbs: ["get", "list", "watch"]
 - apiGroups: [""]
   resources: ["pods"]
